@@ -1,0 +1,7 @@
+#:import Animation kivy.animation.Animation
+
+Button
+    on_state:
+        Animation.cancel_all(self)
+        self.text = args[1]
+        animation = Animation(opacity = 0 if args[1] == 'down' else 1).start(self)

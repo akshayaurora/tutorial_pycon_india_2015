@@ -1,0 +1,77 @@
+# Create a menu for each screen showcasing plyer power
+#:import Animation kivy.animation.Animation
+#:import NavigationDrawer kivy.garden.NavigationDrawer
+#:import VBoxLayout uix.layouts.VBoxLayout
+
+<AnimButton@Button>
+    on_state:
+        Animation.cancel_all(self)
+        Animation(d=0.25, opacity=0 if self.state == 'down' else 1).start(self)
+
+<ScrButton@AnimButton>
+    on_release: app.root.ids.manager.current  = self.text
+
+
+VBoxLayout
+    ActionBar
+        ActionView
+            ActionPrevious
+                app_icon: 'data/images/hamburger.png'
+                with_previous: False
+                on_release: navigation_drawer.toggle_state()
+                
+    NavigationDrawer
+        id: navigation_drawer
+        VBoxLayout
+            ScrButton
+                text: 'Plyer Power'
+            ScrButton
+                text: 'Responsive Design'
+            ScrButton
+                text: 'Effect Widget'   
+        ScreenManager
+            id: manager
+
+            Screen
+                name: 'Plyer Power'
+                VBoxLayout
+                    AnimButton
+                        text: 'Speak'
+                        on_release:
+                            from plyer import tts
+                            tts.speak('Welcome tp Pycon India')
+                    AnimButton
+                        text: 'Notification'
+                        on_release:
+                            from plyer import notification
+                            notification.notify('New Message From Tutorial App')
+                    AnimButton
+                        text: 'Compass'
+                        on_release:
+                            from plyer import compass, tts
+                            compass.enable()
+                            tts.speak(compass.orientation)
+                    AnimButton
+                        text: 'Vibrate'
+                        on_release:
+                            from plyer import vibrator
+                            if vibrator.exists(): vibrator.vibrate(3)
+                    AnimButton
+                        text: 'GPS'
+                        on_release:
+                            from plyer import GPS, tts
+                            my_func = lambda *kwargs: tts.speak('lon: {}, lon:{}'.format(**kwargs))
+                            gps.configure(on_location=my_func)
+                            gps.start()
+
+                    ScrButton
+                        text: 'Accelerometer'
+            
+            Screen
+                name: 'Responsive Design'
+
+            Screen
+                name: 'Effect Widget'
+            Screen:
+                name: 'Accelerometer'
+                on_enter: if not self.children: app.load_accelerometer(self)
